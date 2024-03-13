@@ -5,4 +5,4 @@
 
 这是一款基于密保问题的自动化 Apple ID 检测&解锁程序。
 
-请移步至我们的[GitBook](https://docs.appleidauto.org/)查看详细说明和使用教程。
+请前往我们的[官网](https://appleauto.pro/)查看详细说明和使用教程。
