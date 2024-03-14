@@ -55,10 +55,7 @@ rsync -aq --remove-source-files "$filename/" ./
 rm -rf "$filename"
 rm -rf "$filename.zip"
 UPGRADE_DB=$(jq -r '.upgrade_db' "$UPGRADE_FILE")
-if [ "$UPGRADE_DB" == "true" ]; then
-    echo -e "${GREEN}执行数据库迁移...${NC}"
-    php think migrate:run
-fi
+php think migrate:run
 php composer.phar upgrade --no-interaction
 chmod -R 755 ./*
 chown -R www:www ./*
