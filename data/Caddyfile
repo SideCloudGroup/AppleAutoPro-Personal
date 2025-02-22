@@ -1,0 +1,9 @@
+your-domain.com {
+    # 若使用CDN，请注意SSL/TLS配置
+    tls your-email@example.com
+    root * /var/www/html/public
+    encode gzip
+    php_fastcgi php-fpm:9000
+    file_server
+    try_files {path} {path}/ /index.php?s={uri}
+}
