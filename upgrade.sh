@@ -1,4 +1,6 @@
 #!/bin/sh
+set -euo pipefail
+IFS=$'\n\t'
 # AppleAutoPro-Personal 更新脚本
 RED='\033[0;31m'
 GREEN='\033[0;32m'
