@@ -48,7 +48,6 @@ echo -e "${BLUE}If there are changes in the file, it will be replaced with the l
 echo -e "${YELLOW}请按回车继续执行更新 | Press enter to continue...${NC}"
 read
 echo -e "${GREEN}正在升级到最新版本：$LATEST_TAG${NC}"
-docker compose down
 if [ "$isCN" = "true" ]; then
     wget -T 20 -q "https://ghfast.top/github.com/$repo/archive/refs/heads/v4.zip" -O "v4.zip"
     wget -T 20 -q "https://ghfast.top/github.com/$repo/releases/download/$LATEST_TAG/$filename.zip" -O "$filename.zip"
@@ -61,7 +60,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 unzip -q -o "v4.zip"
-rsync -av --remove-source-files "$filename-4"/ ./
+rsync -av --remove-source-files --exclude 'docker-compose.yml' "$filename-4"/ ./
 rm -rf "$filename-4"
 rm -rf "v4.zip"
 unzip -q -o "$filename.zip"
@@ -76,7 +75,7 @@ rm -rf "$filename.zip"
 docker compose pull
 chmod +x ./data/entrypoint.sh
 echo -e "${GREEN}更新完成，请查看更新日志，检查前端配置文件是否需要改动。${NC}"
-docker compose pull
+docker compose down
 docker compose up -d
 echo -e "${YELLOW}是否要清理旧镜像？(y/n)${NC}"
 read prune_choice
