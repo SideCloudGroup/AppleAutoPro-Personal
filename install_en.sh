@@ -1,8 +1,7 @@
 #!/bin/sh
-set -euo pipefail
-IFS=$'\n\t'
 # AppleAutoPro-Personal installation script
-
+IFS=$'\n\t'
+if [ -t 0 ]; then stty erase ^H; fi
 # Color variables
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -83,6 +82,7 @@ if [ ! -d "$filename" ]; then
 fi
 mv "$filename" web
 rm -rf "$filename.zip"
+mv .example.env .env
 
 # Pull Docker images and set permissions
 docker compose pull
