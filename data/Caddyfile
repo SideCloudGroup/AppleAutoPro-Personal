@@ -3,7 +3,14 @@ your-domain.com {
     tls your-email@example.com
     root * /var/www/html/public
     encode gzip
+    @forbiddenDirs {
+        path_regexp forbiddenDirs (?i)/(runtime|application)/
+    }
+    respond @forbiddenDirs 403
+    @notFile {
+        not file
+    }
+    rewrite @notFile /index.php?s={path}&{query}
     php_fastcgi php-fpm:9000
     file_server
-    try_files {path} {path}/ /index.php?s={uri}
 }

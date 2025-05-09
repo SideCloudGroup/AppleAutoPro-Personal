@@ -43,6 +43,10 @@ if [ "$isCN" = "true" ]; then
 else
     LATEST_TAG=$(curl -s "https://api.github.com/repos/$repo/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 fi
+if [ -z "$LATEST_TAG" ]; then
+    echo -e "${RED}获取版本号失败，退出脚本${NC}"
+    exit 1
+fi
 echo -e "${BLUE}如文件存在改动，一键更新后将会被替换至最新版本，改动将会消失，请注意备份${NC}"
 echo -e "${BLUE}If there are changes in the file, it will be replaced with the latest version after one-click update, and the changes will disappear. Please backup.${NC}"
 echo -e "${YELLOW}请按回车继续执行更新 | Press enter to continue...${NC}"
@@ -60,7 +64,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 unzip -q -o "v4.zip"
-rsync -av --remove-source-files --exclude 'docker-compose.yml' "$filename-4"/ ./
+rsync -av --remove-source-files --exclude 'docker-compose.yml' --exclude 'Caddyfile' "$filename-4"/ ./
 rm -rf "$filename-4"
 rm -rf "v4.zip"
 unzip -q -o "$filename.zip"

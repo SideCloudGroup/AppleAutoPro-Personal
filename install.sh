@@ -43,6 +43,10 @@ if [ "$isCN" = "true" ]; then
 else
     LATEST_TAG=$(curl -s "https://api.github.com/repos/$repo/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 fi
+if [ -z "$LATEST_TAG" ]; then
+    echo -e "${RED}获取版本号失败，退出脚本${NC}"
+    exit 1
+fi
 echo -e "${YELLOW}请输入安装路径（回车默认安装到/opt/AppleAutoPro-Personal）:${NC}"
 read install_path
 install_path=${install_path:-/opt/AppleAutoPro-Personal}
