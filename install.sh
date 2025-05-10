@@ -39,7 +39,7 @@ geo_check() {
 }
 geo_check
 if [ "$isCN" = "true" ]; then
-    LATEST_TAG=$(curl -s "https://ghfast.top/api.github.com/repos/$repo/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    LATEST_TAG="4.0.0"
 else
     LATEST_TAG=$(curl -s "https://api.github.com/repos/$repo/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 fi
