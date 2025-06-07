@@ -38,14 +38,16 @@ geo_check() {
     done
 }
 geo_check
-if [ "$isCN" = "true" ]; then
-    LATEST_TAG="4.0.0"
-else
-    LATEST_TAG=$(curl -s "https://api.github.com/repos/$repo/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-fi
+LATEST_TAG=$(curl -m 10 -s "https://api.github.com/repos/$repo/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 if [ -z "$LATEST_TAG" ]; then
-    echo -e "${RED}获取版本号失败，退出脚本${NC}"
-    exit 1
+    echo -e "${RED}获取版本号失败或超时，请手动输入版本号（例如：4.0.0）：${NC}"
+    read manual_tag
+    if [[ "$manual_tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        LATEST_TAG="$manual_tag"
+    else
+        echo -e "${RED}输入的版本号格式不正确，退出脚本${NC}"
+        exit 1
+    fi
 fi
 echo -e "${YELLOW}请输入安装路径（回车默认安装到/opt/AppleAutoPro-Personal）:${NC}"
 read install_path
