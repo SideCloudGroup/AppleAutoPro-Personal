@@ -51,6 +51,7 @@ if [ -z "$LATEST_TAG" ]; then
 fi
 echo -e "${BLUE}如文件存在改动，一键更新后将会被替换至最新版本，改动将会消失，请注意备份${NC}"
 echo -e "${BLUE}If there are changes in the file, it will be replaced with the latest version after one-click update, and the changes will disappear. Please backup.${NC}"
+echo -e "${GREEN}当前最新版本：$LATEST_TAG | Current latest version: $LATEST_TAG${NC}"
 echo -e "${YELLOW}请按回车继续执行更新 | Press enter to continue...${NC}"
 read
 echo -e "${GREEN}正在升级到最新版本：$LATEST_TAG${NC}"
