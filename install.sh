@@ -9,6 +9,35 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 repo="SideCloudGroup/AppleAutoPro-Personal"
 filename="AppleAutoPro-Personal"
+
+check_docker_permission() {
+  current_user=$(whoami)
+  if [ "$current_user" != "root" ]; then
+    if [ "$(uname)" = "Darwin" ]; then
+      echo -e "${BLUE}已检测到系统为${YELLOW}macOS${NC}"
+      if ! docker info &>/dev/null; then
+        echo -e "${RED}当前无法连接到Docker进程${NC}"
+        echo -e "${YELLOW}请检查是否已安装Docker Desktop以及Docker Desktop服务是否已启动！${NC}"
+        echo -e "${RED}如果您确信Docker Desktop已在运行，请尝试使用root(sudo)运行此脚本！${NC}"
+        exit 1
+      fi
+    else
+      echo -e "${BLUE}已检测到系统为${YELLOW}Linux${NC}"
+      if ! id -nG "$current_user" | grep -qw docker; then
+        echo -e "${RED}当前用户非root且不在docker用户组中，没有使用docker的权限${NC}"
+        echo -e "${YELLOW}解决方法：${NC}"
+        echo -e "1.${BLUE}将当前用户加入docker用户组并重新进入终端${YELLOW}(sudo gpasswd -a 用户名 docker)${NC}"
+        echo -e "2.${BLUE}直接使用root(sudo)运行此脚本！${NC}"
+        exit 1
+      fi
+    fi
+  else
+    echo -e "${BLUE}已检测到当前用户为${YELLOW}root${NC}"
+  fi
+}
+
+check_docker_permission
+
 if ! command -v unzip &> /dev/null || ! command -v curl &> /dev/null || ! command -v wget &> /dev/null || ! command -v rsync &> /dev/null; then
     echo -e "${YELLOW}缺少必要的工具，正在安装……${NC}"
     if [ -f /etc/debian_version ]; then
