@@ -35,9 +35,7 @@ check_docker_permission() {
     echo -e "${BLUE}已检测到当前用户为${YELLOW}root${NC}"
   fi
 }
-
 check_docker_permission
-
 if ! command -v unzip &> /dev/null || ! command -v curl &> /dev/null || ! command -v wget &> /dev/null || ! command -v rsync &> /dev/null; then
     echo -e "${YELLOW}缺少必要的工具，正在安装……${NC}"
     if [ -f /etc/debian_version ]; then
@@ -51,18 +49,27 @@ if ! command -v unzip &> /dev/null || ! command -v curl &> /dev/null || ! comman
     fi
 fi
 geo_check() {
-    api_list="https://blog.cloudflare.com/cdn-cgi/trace https://dash.cloudflare.com/cdn-cgi/trace https://developers.cloudflare.com/cdn-cgi/trace"
+    api_list="https://cloudflare.com/cdn-cgi/trace https://blog.cloudflare.com/cdn-cgi/trace https://dash.cloudflare.com/cdn-cgi/trace https://developers.cloudflare.com/cdn-cgi/trace"
     ua="Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0"
     isCN="false"
     for url in $api_list; do
-        text="$(curl -A "$ua" -m 10 -s "$url")"
-        endpoint="$(echo "$text" | sed -n 's/.*h=\([^ ]*\).*/\1/p')"
-        if echo "$text" | grep -qw 'CN'; then
-            isCN="true"
+        text="$(curl -A "$ua" -m 10 -s "$url" 2>/dev/null)"
+        if [ -z "$text" ]; then
+            continue
+        fi
+        location="$(echo "$text" | grep '^loc=' | cut -d'=' -f2)"
+        if [ -n "$location" ]; then
+            if [ "$location" = "CN" ]; then
+                isCN="true"
+            else
+                isCN="false"
+            fi
             break
-        elif echo "$url" | grep -q "$endpoint"; then
-            isCN="false"
-            break
+        else
+            if echo "$text" | grep -q 'CN'; then
+                isCN="true"
+                break
+            fi
         fi
     done
 }
