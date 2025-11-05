@@ -8,10 +8,6 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - appleautopro-network
     healthcheck:
       test: ["CMD", "test", "-f", "/var/run/php/php-fpm.pid"]
       interval: 10s
@@ -37,8 +33,6 @@ services:
 #    depends_on:
 #      php-fpm:
 #        condition: service_healthy
-#    networks:
-#      - appleautopro-network
 #    restart: always
 #    logging:
 #      options:
@@ -56,8 +50,6 @@ services:
     depends_on:
       php-fpm:
         condition: service_healthy
-    networks:
-      - appleautopro-network
     restart: always
     logging:
       options:
@@ -66,22 +58,8 @@ services:
 
   redis:
     image: redis:latest
-    # 前后端分离部署时，请取消以下注释内容，并在env文件中设置redis密码
-#    env_file:
-#      - .env
-#    command: redis-server --requirepass "${REDIS_PASSWORD}" --bind 0.0.0.0
-#    ports:
-#      - "6379:6379"
     volumes:
       - ./data/redis:/data
-    networks:
-      - appleautopro-network
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 5s
     restart: always
     logging:
       options:
@@ -95,9 +73,8 @@ services:
     volumes:
       - ./data/mariadb/data:/var/lib/mysql
       - ./data/mariadb/conf:/etc/mysql/conf.d
-    networks:
-      - appleautopro-network
     restart: always
+    command: --skip-log-bin
     healthcheck:
       test: [ "CMD", "mariadb-admin", "-h", "localhost", "-u${MARIADB_USER}", "-p${MARIADB_PASSWORD}", "ping" ]
       interval: 10s
@@ -117,8 +94,6 @@ services:
     depends_on:
       php-fpm:
         condition: service_healthy
-    networks:
-      - appleautopro-network
     restart: always
     deploy:
       replicas: ${BACKEND_THREADS}
@@ -126,7 +101,3 @@ services:
       options:
         max-size: "3m"
         max-file: "2"
-
-networks:
-  appleautopro-network:
-    driver: bridge

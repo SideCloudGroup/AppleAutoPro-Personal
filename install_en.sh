@@ -110,7 +110,7 @@ if [ ! -d "$filename" ]; then
 fi
 mv "$filename" web
 rm -rf "$filename.zip"
-mv .example.env .env
+mv .example.en.env .env
 
 # Pull Docker images and set permissions
 docker compose pull
