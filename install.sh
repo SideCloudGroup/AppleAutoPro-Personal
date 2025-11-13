@@ -49,14 +49,17 @@ if ! command -v unzip &> /dev/null || ! command -v curl &> /dev/null || ! comman
     fi
 fi
 geo_check() {
-    api_list="https://cloudflare.com/cdn-cgi/trace https://blog.cloudflare.com/cdn-cgi/trace https://dash.cloudflare.com/cdn-cgi/trace https://developers.cloudflare.com/cdn-cgi/trace"
+    api_list=(
+        "https://cloudflare.com/cdn-cgi/trace"
+        "https://blog.cloudflare.com/cdn-cgi/trace"
+        "https://dash.cloudflare.com/cdn-cgi/trace"
+        "https://developers.cloudflare.com/cdn-cgi/trace"
+    )
     ua="Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0"
     isCN="false"
-    for url in $api_list; do
-        text="$(curl -A "$ua" -m 10 -s "$url" 2>/dev/null)"
-        if [ -z "$text" ]; then
-            continue
-        fi
+    for url in "${api_list[@]}"; do
+        text="$(curl -A "$ua" -m 10 -sSL "$url" 2>/dev/null)" || continue
+        [ -z "$text" ] && continue
         location="$(echo "$text" | grep '^loc=' | cut -d'=' -f2)"
         if [ -n "$location" ]; then
             if [ "$location" = "CN" ]; then
@@ -66,7 +69,7 @@ geo_check() {
             fi
             break
         else
-            if echo "$text" | grep -q 'CN'; then
+            if echo "$text" | grep -q 'loc=CN'; then
                 isCN="true"
                 break
             fi
