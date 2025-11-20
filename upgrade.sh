@@ -78,7 +78,7 @@ geo_check() {
 }
 geo_check
 LATEST_TAG=$(curl -m 10 -s "https://api.github.com/repos/$repo/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-if [ -z "$LATEST_TAG" ]; then
+if [ "$isCN" = "true" ]; then
     echo -e "${RED}获取版本号失败或超时，请手动输入版本号（例如：4.0.0）：${NC}"
     read manual_tag
     if [[ "$manual_tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
