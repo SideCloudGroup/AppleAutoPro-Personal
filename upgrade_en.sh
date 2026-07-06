@@ -84,9 +84,37 @@ geo_check() {
         fi
     done
 }
+self_update_script() {
+    script_name=$(basename "$0")
+    tmp=$(mktemp) || return 0
+    if [ "$isCN" = "true" ]; then
+        url="https://ghfast.top/https://raw.githubusercontent.com/$repo/v4/$script_name"
+    else
+        url="https://raw.githubusercontent.com/$repo/v4/$script_name"
+    fi
+    if ! curl -m 10 -sSL "$url" -o "$tmp" || [ ! -s "$tmp" ]; then
+        rm -f "$tmp"
+        return 0
+    fi
+    if command -v sha256sum >/dev/null 2>&1; then
+        remote_hash=$(sha256sum "$tmp" | awk '{print $1}')
+        local_hash=$(sha256sum "$0" | awk '{print $1}')
+    else
+        remote_hash=$(shasum -a 256 "$tmp" | awk '{print $1}')
+        local_hash=$(shasum -a 256 "$0" | awk '{print $1}')
+    fi
+    if [ "$remote_hash" != "$local_hash" ]; then
+        cp "$tmp" "$0" && chmod +x "$0"
+        rm -f "$tmp"
+        echo -e "${YELLOW}Upgrade script has been updated, please re-run: ./$script_name${NC}"
+        exit 0
+    fi
+    rm -f "$tmp"
+}
 geo_check
+self_update_script
 LATEST_TAG=$(curl -m 10 -s "https://api.github.com/repos/$repo/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-if [ "$isCN" = "true" ]; then
+if [ -z "$LATEST_TAG" ]; then
     echo -e "${RED}Failed to get version number or timeout, please manually enter version number (e.g.: 4.0.0):${NC}"
     read manual_tag
     if [[ "$manual_tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then

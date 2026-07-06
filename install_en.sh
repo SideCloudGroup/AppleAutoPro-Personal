@@ -55,7 +55,17 @@ if ! command -v unzip &> /dev/null || ! command -v curl &> /dev/null || ! comman
 fi
 
 # Fetch latest release tag
-LATEST_TAG=$(curl -s "https://api.github.com/repos/$repo/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+LATEST_TAG=$(curl -m 10 -s "https://api.github.com/repos/$repo/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+if [ -z "$LATEST_TAG" ]; then
+    echo -e "${RED}Failed to get version number or timeout, please manually enter version number (e.g.: 4.0.0):${NC}"
+    read manual_tag
+    if [[ "$manual_tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        LATEST_TAG="$manual_tag"
+    else
+        echo -e "${RED}Version number format is incorrect, exiting script${NC}"
+        exit 1
+    fi
+fi
 
 # Prompt for installation path
 echo -e "${YELLOW}Enter installation path (default /opt/AppleAutoPro-Personal):${NC}"
