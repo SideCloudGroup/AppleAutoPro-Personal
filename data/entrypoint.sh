@@ -29,7 +29,7 @@ geo_check
 cd /var/www/html || exit 1
 if [ "$isCN" = "true" ]; then
     echo "使用国内镜像"
-    composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
+    composer config -g repo.packagist composer https://mirrors.huaweicloud.com/repository/php/
 fi
 composer upgrade --no-interaction --optimize-autoloader
 chown -R www-data:www-data /var/www/html
