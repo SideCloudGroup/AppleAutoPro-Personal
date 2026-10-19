@@ -25,13 +25,24 @@ geo_check() {
         fi
     done
 }
+COMPOSER_MIRROR="https://mirrors.cloud.tencent.com/composer/"
 geo_check
 cd /var/www/html || exit 1
-if [ "$isCN" = "true" ]; then
+if [ "$isCN" = "true" ] && curl -fsS -m 10 -o /dev/null "${COMPOSER_MIRROR}packages.json"; then
     echo "使用国内镜像"
-    composer config -g repo.packagist composer https://mirrors.cloud.tencent.com/composer/
+    composer config -g repo.packagist composer "$COMPOSER_MIRROR"
+    if ! composer upgrade --no-interaction --optimize-autoloader; then
+        echo "国内镜像安装失败，回退到官方源"
+        composer config -g --unset repo.packagist >/dev/null 2>&1 || true
+        composer upgrade --no-interaction --optimize-autoloader
+    fi
+else
+    if [ "$isCN" = "true" ]; then
+        echo "国内镜像不可用，使用官方源"
+    fi
+    composer config -g --unset repo.packagist >/dev/null 2>&1 || true
+    composer upgrade --no-interaction --optimize-autoloader
 fi
-composer upgrade --no-interaction --optimize-autoloader
 chown -R www-data:www-data /var/www/html
 chmod -R 755 /var/www/html
 php think migrate:run
